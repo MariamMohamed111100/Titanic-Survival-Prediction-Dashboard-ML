@@ -41,7 +41,7 @@ titanic-survival-prediction/
 │   └── Original/                 # Original dataset files
 │ 
 ├── doc/
-│   └── test_cases.md             # Test case
+│   └── test_cases.md             # Test cases
 │ 
 ├── models/
 │   └── logistic_regression_smote.pkl  # Trained ML model
