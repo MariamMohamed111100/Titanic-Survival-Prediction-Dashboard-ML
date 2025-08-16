@@ -40,18 +40,36 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Load data and model
+# Load data and model with error handling
 @st.cache_data
 def load_data():
-    return pd.read_csv('../Data/tested_cleaned.csv')
+    try:
+        return pd.read_csv('../Data/tested_cleaned.csv')
+    except FileNotFoundError:
+        st.error("❌ Data file not found. Please ensure '../Data/tested_cleaned.csv' exists.")
+        return None
+    except Exception as e:
+        st.error(f"❌ Error loading data: {str(e)}")
+        return None
 
 @st.cache_resource
 def load_model():
-    return joblib.load('../models/logistic_regression_smote.pkl')
+    try:
+        return joblib.load('../models/best_titanic_model.pkl')
+    except FileNotFoundError:
+        st.error("❌ Model file not found. Please ensure '../models/best_titanic_model.pkl' exists.")
+        return None
+    except Exception as e:
+        st.error(f"❌ Error loading model: {str(e)}")
+        return None
 
-# Initialize
+# Initialize with error handling
 df = load_data()
 model = load_model()
+
+# Check if files loaded successfully
+if df is None or model is None:
+    st.stop()
 
 # Header
 st.markdown('<h1 class="main-header">🚢 Titanic Survival Prediction Dashboard</h1>', unsafe_allow_html=True)
@@ -86,7 +104,6 @@ if page == "Home":
     
     ### Dataset Overview:
     - **Passenger Class**: 1st, 2nd, 3rd class
-    - **Sex**: Male (0) or Female (1)
     - **Age**: Passenger age
     - **Siblings/Spouses**: Number aboard
     - **Parents/Children**: Number aboard
@@ -162,7 +179,6 @@ elif page == "Prediction":
     
     with col1:
         pclass = st.selectbox("Passenger Class", [1, 2, 3], index=2)
-        sex = st.selectbox("Sex", [0, 1], format_func=lambda x: ['Male', 'Female'][x])
         age = st.slider("Age", 0, 80, 30)
         sibsp = st.number_input("Siblings/Spouses Aboard", 0, 10, 0)
     
@@ -175,7 +191,6 @@ elif page == "Prediction":
         # Prepare input
         input_data = pd.DataFrame({
             'Pclass': [pclass],
-            'Sex': [sex],
             'Age': [age],
             'SibSp': [sibsp],
             'Parch': [parch],
@@ -264,16 +279,38 @@ elif page == "Model Performance":
     # Feature Importance
     st.subheader("Feature Importance")
     feature_names = X.columns
-    coefficients = model.coef_[0]
     
-    importance_df = pd.DataFrame({
-        'Feature': feature_names,
-        'Coefficient': coefficients
-    }).sort_values('Coefficient', ascending=True)
-    
-    fig_importance = px.bar(importance_df, x='Coefficient', y='Feature',
-                           orientation='h', title='Feature Importance (Logistic Regression Coefficients)')
-    st.plotly_chart(fig_importance, use_container_width=True)
+    try:
+        # Try to get feature importance for tree-based models
+        if hasattr(model, 'feature_importances_'):
+            # For tree-based models (RandomForest, XGBoost, etc.)
+            importances = model.feature_importances_
+            importance_df = pd.DataFrame({
+                'Feature': feature_names,
+                'Importance': importances
+            }).sort_values('Importance', ascending=True)
+            
+            fig_importance = px.bar(importance_df, x='Importance', y='Feature',
+                                   orientation='h', title='Feature Importance')
+            st.plotly_chart(fig_importance, use_container_width=True)
+            
+        elif hasattr(model, 'coef_'):
+            # For linear models (Logistic Regression, etc.)
+            coefficients = model.coef_[0]
+            importance_df = pd.DataFrame({
+                'Feature': feature_names,
+                'Coefficient': coefficients
+            }).sort_values('Coefficient', ascending=True)
+            
+            fig_importance = px.bar(importance_df, x='Coefficient', y='Feature',
+                                   orientation='h', title='Feature Importance (Coefficients)')
+            st.plotly_chart(fig_importance, use_container_width=True)
+            
+        else:
+            st.info("Feature importance visualization not available for this model type")
+            
+    except Exception as e:
+        st.error(f"Error displaying feature importance: {str(e)}")
 
 # Footer
 st.sidebar.markdown("---")

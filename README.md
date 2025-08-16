@@ -39,7 +39,10 @@ titanic-survival-prediction/
 ├── Data/
 │   ├── tested_cleaned.csv        # Cleaned dataset
 │   └── Original/                 # Original dataset files
-│
+│ 
+├── doc/
+│   └── test_cases.md             # Test case
+│ 
 ├── models/
 │   └── logistic_regression_smote.pkl  # Trained ML model
 │
@@ -81,7 +84,6 @@ titanic-survival-prediction/
 
 The dataset contains information about Titanic passengers including:
 - **Passenger Class** (1st, 2nd, 3rd)
-- **Sex** (Male/Female)
 - **Age** (0-80 years)
 - **Siblings/Spouses Aboard**
 - **Parents/Children Aboard**
@@ -90,10 +92,11 @@ The dataset contains information about Titanic passengers including:
 
 ## 🤖 Model Details
 
-- **Algorithm**: Logistic Regression with SMOTE (Synthetic Minority Over-sampling Technique)
+- **Algorithm**: XGBoost Classifier (tree-based ensemble model)
 - **Accuracy**: Displayed in the Model Performance section
-- **Features**: 7 numerical features after preprocessing
+- **Features**: 6 numerical features after preprocessing
 - **Target**: Binary classification (Survived/Not Survived)
+- **Feature Engineering**: Categorical variables encoded as numerical values
 
 ## 🎯 Usage Guide
 
@@ -107,7 +110,6 @@ The dataset contains information about Titanic passengers including:
 1. Go to "Prediction" tab
 2. Enter passenger details:
    - Passenger class (1st, 2nd, 3rd)
-   - Sex (Male/Female)
    - Age
    - Family members aboard
    - Ticket fare
@@ -151,7 +153,7 @@ Contributions are welcome! Please feel free to submit a Pull Request. For major 
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 🙏 Acknowledgments
+## � Acknowledgments
 
 - Titanic dataset from Kaggle
 - Streamlit community for excellent documentation
