@@ -44,7 +44,7 @@ st.markdown("""
 @st.cache_data
 def load_data():
     try:
-        return pd.read_csv('../Data/tested_cleaned.csv')
+        return pd.read_csv('Data/tested_cleaned.csv')
     except FileNotFoundError:
         st.error("❌ Data file not found. Please ensure '../Data/tested_cleaned.csv' exists.")
         return None
@@ -55,7 +55,7 @@ def load_data():
 @st.cache_resource
 def load_model():
     try:
-        return joblib.load('../models/best_titanic_model.pkl')
+        return joblib.load('models/best_titanic_model.pkl')
     except FileNotFoundError:
         st.error("❌ Model file not found. Please ensure '../models/best_titanic_model.pkl' exists.")
         return None
